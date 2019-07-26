@@ -16,16 +16,16 @@ class SendCheckUserEmailJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $user_array;
+    protected $check_user_data_array;
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($user_array)
+    public function __construct($check_user_data_array)
     {
         //
-        $this->user_array = $user_array;
+        $this->check_user_data_array = $check_user_data_array;
     }
 
     /**
@@ -36,14 +36,15 @@ class SendCheckUserEmailJob implements ShouldQueue
     public function handle()
     {
         //
-        $user_array = $this->user_array;
-        if( isset($user_array) ){
-            $toUserArray = array('kasunv@brandix.com', 'Prabhathdh@brandix.com', 'SumithK@brandix.com', 'SamithaSu@brandix.com', 'PoornimalA@brandix.com', 'TharangaWij@brandix.com');
+        $check_user_data_array = $this->check_user_data_array;
+        $to_user_array = $this->check_user_data_array;
+        if( (isset($check_user_data_array)) && (!empty($check_user_data_array['mail_user_array_to'])) ){
+            $toUserArray = $check_user_data_array['mail_user_array_to'];
             Mail::to($toUserArray)
                 //->subject("Subject")
                 //->cc($ccUserArray)
                 //->bcc($bccUserArray)
-                ->send(new SendCheckUserMail($user_array));
+                ->send(new SendCheckUserMail($check_user_data_array));
         }
     }
 }

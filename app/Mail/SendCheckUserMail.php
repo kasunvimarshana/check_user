@@ -11,16 +11,16 @@ class SendCheckUserMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    protected $user_array;
+    protected $check_user_data_array;
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($user_array)
+    public function __construct($check_user_data_array)
     {
         //
-        $this->user_array = $user_array;
+        $this->check_user_data_array = $check_user_data_array;
     }
 
     /**
@@ -31,12 +31,12 @@ class SendCheckUserMail extends Mailable
     public function build()
     {
         //return $this->view('view.name');
-        $user_array = $this->user_array;
+        $check_user_data_array = $this->check_user_data_array;
         $message = $this;
         
         $message = $message->subject("Users");
         $message = $message->view('mail.check_user_mail')->with([
-            'user_array' => $user_array
+            'check_user_data_array' => $check_user_data_array
         ]);
         
         return $message;

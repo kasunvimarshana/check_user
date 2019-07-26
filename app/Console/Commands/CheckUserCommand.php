@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use DB;
 use Carbon\Carbon;
@@ -51,58 +52,120 @@ class CheckUserCommand extends Command
     public function handle()
     {
         //
-        try{
-            $host = gethostbyaddr("10.150.152.14");
-            $file_uri_user_hcm = "//" . $host . "/userdata$/Common_Share/ICT/Employee_Reconciliation/HCM.xls";
-            $file_uri_user_ad = "//" . $host . "/userdata$/Common_Share/ICT/Employee_Reconciliation/BLI-Users.csv";
+        $emailJob = null;
+        $resultDataArray = array();
+        $checkUserDataArray = array(
+            array(
+                'sbu' => 'BLI',
+                'host' => '10.150.152.14',
+                'file_uri_user_hcm' => '/userdata$/Common_Share/ICT/Employee_Reconciliation/HCM.xls',
+                'file_uri_user_ad' => '/userdata$/Common_Share/ICT/Employee_Reconciliation/BLI-Users.csv',
+                'mail_user_array_to' => array(
+                    'kasunv@brandix.com'
+                )
+            )
+        );
 
-            //$array = Excel::toArray(new Import, $file);
-            //$array = Excel::toCollection(new Import, $file);
+        foreach( $checkUserDataArray as $checkUserDataKey => $checkUserDataValue ){
 
-            $userHCMImportObject = new UserHCMImport();
-            $userADImportObject = new UserADImport();
+            try{
 
-            $array_user_hcm = Excel::toCollection($userHCMImportObject, $file_uri_user_hcm);
-            $array_user_ad = Excel::toCollection($userADImportObject, $file_uri_user_ad);
+                $sbu = $checkUserDataValue['sbu']
+                $host = gethostbyaddr( $checkUserDataValue['host'] );
+                $file_uri_user_hcm = "//" . $host . $checkUserDataValue['file_uri_user_hcm'];
+                $file_uri_user_ad = "//" . $host . $checkUserDataValue['file_uri_user_ad'];
 
-            $array_user_hcm = $array_user_hcm->last();
-            $array_user_ad = $array_user_ad->last();
+                $resultDataArray['check_user_data'] = $checkUserDataValue;
+                    
+                //$array = Excel::toArray(new Import, $file);
+                //$array = Excel::toCollection(new Import, $file);
 
-            foreach($array_user_ad as $key_user_ad => &$value_user_ad){
-                if($key_user_ad == 0){
-                    unset($array_user_ad[$key_user_ad]);
-                    continue;
-                }
-                if((is_null($value_user_ad[4]))){
-                    unset($array_user_ad[$key_user_ad]);
-                    continue;
-                }
-                if((is_null($value_user_ad[3]))){
-                    unset($array_user_ad[$key_user_ad]);
-                    continue;
-                }
-                if((strcasecmp($value_user_ad[3] ,'Executive') == 0)){
-                    unset($array_user_ad[$key_user_ad]);
-                    continue;
-                }
-                foreach($array_user_hcm as $key_user_hcm => $value_user_hcm){
-                    if($key_user_hcm == 0){
-                        continue;
+                //$content = File::lastModified( $file_uri );
+                //$content = File::isFile( $file_uri );
+                //$content = File::extension( $file_uri );
+                //$content = File::basename( $file_uri );
+                //$content = File::name( $file_uri );
+                //$content = File::exists( $file_uri );
+                //$content = File::isReadable( $file_uri );
+
+                //$dt1 = Carbon::now()->startOfDay();
+                //$dt2 = $dt1->copy()->timestamp( $content );
+                //$dt2 = $dt1->copy()->setTimestamp( $content )->startOfDay();
+                //$dt1->greaterThan( $dt2 );
+
+                $date_today = Carbon::now()->startOfDay();
+                $date_timestamp_last_modified_hcm = File::lastModified( $file_uri_user_hcm );
+                $date_timestamp_last_modified_ad = File::lastModified( $file_uri_user_ad );
+
+                $date_last_modified_hcm = $date_today->copy()->setTimestamp( $content )->startOfDay();
+                $date_last_modified_ad = $date_today->copy()->setTimestamp( $content )->startOfDay();
+                
+                $resultDataArray['date_today'] = $date_today;
+                $resultDataArray['date_last_modified_hcm'] = $date_last_modified_hcm;
+                $resultDataArray['date_last_modified_ad'] = $date_last_modified_ad;
+
+                if( ($date_today->lessThanOrEqualTo( $date_last_modified_hcm )) && ($date_today->lessThanOrEqualTo( $date_last_modified_ad )) ){
+
+                    $userHCMImportObject = new UserHCMImport();
+                    $userADImportObject = new UserADImport();
+
+                    $array_user_hcm = Excel::toCollection($userHCMImportObject, $file_uri_user_hcm);
+                    $array_user_ad = Excel::toCollection($userADImportObject, $file_uri_user_ad);
+
+                    $array_user_hcm = $array_user_hcm->last();
+                    $array_user_ad = $array_user_ad->last();
+
+                    foreach($array_user_ad as $key_user_ad => &$value_user_ad){
+                        if($key_user_ad == 0){
+                            unset($array_user_ad[$key_user_ad]);
+                            continue;
+                        }
+                        if((is_null($value_user_ad[4]))){
+                            unset($array_user_ad[$key_user_ad]);
+                            continue;
+                        }
+                        if((is_null($value_user_ad[3]))){
+                            unset($array_user_ad[$key_user_ad]);
+                            continue;
+                        }
+                        if((strcasecmp($value_user_ad[3] ,'Executive') == 0)){
+                            unset($array_user_ad[$key_user_ad]);
+                            continue;
+                        }
+                        foreach($array_user_hcm as $key_user_hcm => $value_user_hcm){
+                            if($key_user_hcm == 0){
+                                continue;
+                            }
+                            if( (intval($value_user_hcm[1]) == intval($value_user_ad[4])) ){
+                                //equal
+                                unset($array_user_ad[$key_user_ad]);
+                                break(1);
+                            }
+                        }
                     }
-                    if( (intval($value_user_hcm[1]) == intval($value_user_ad[4])) ){
-                        //equal
-                        unset($array_user_ad[$key_user_ad]);
-                        break(1);
-                    }
-                }
-            }
 
-            if( ($array_user_ad) && (!$array_user_ad->isEmpty()) ){
-                $emailJob = (new SendCheckUserEmailJob($array_user_ad));
+                    if( ($array_user_ad) && (!$array_user_ad->isEmpty()) ){
+                        $resultDataArray['message'] = 'User Account verified';
+                        $resultDataArray['array_user_ad'] = $array_user_ad;
+                        $emailJob = (new SendCheckUserEmailJob( $resultDataArray ));
+                        //dispatch($emailJob);
+                    }else{
+                        $resultDataArray['message'] = 'User Account verified, No discrepancy is found';
+                        $emailJob = (new SendCheckUserEmailJob( $resultDataArray ));
+                        //dispatch($emailJob);
+                    }
+
+                }else{
+                    $resultDataArray['message'] = 'CSV file update error';
+                    $emailJob = (new SendCheckUserEmailJob( $resultDataArray ));
+                    //dispatch($emailJob);
+                }
+                
                 dispatch($emailJob);
+            }catch(Exception $e){
+
             }
-        }catch(Exception $e){
-            
+
         }
         
     }
