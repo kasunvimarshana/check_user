@@ -61,7 +61,7 @@ class CheckUserCommand extends Command
                 'file_uri_user_hcm' => '/userdata$/Common_Share/ICT/Employee_Reconciliation/HCM.xls',
                 'file_uri_user_ad' => '/userdata$/Common_Share/ICT/Employee_Reconciliation/BLI-Users.csv',
                 'mail_user_array_to' => array(
-                    'kasunv@brandix.com'
+                    'kasunv@brandix.com', 'Prabhathdh@brandix.com', 'SumithK@brandix.com', 'SamithaSu@brandix.com', 'PoornimalA@brandix.com', 'TharangaWij@brandix.com'
                 )
             )
         );
@@ -70,7 +70,7 @@ class CheckUserCommand extends Command
 
             try{
 
-                $sbu = $checkUserDataValue['sbu']
+                $sbu = $checkUserDataValue['sbu'];
                 $host = gethostbyaddr( $checkUserDataValue['host'] );
                 $file_uri_user_hcm = "//" . $host . $checkUserDataValue['file_uri_user_hcm'];
                 $file_uri_user_ad = "//" . $host . $checkUserDataValue['file_uri_user_ad'];
@@ -97,8 +97,8 @@ class CheckUserCommand extends Command
                 $date_timestamp_last_modified_hcm = File::lastModified( $file_uri_user_hcm );
                 $date_timestamp_last_modified_ad = File::lastModified( $file_uri_user_ad );
 
-                $date_last_modified_hcm = $date_today->copy()->setTimestamp( $content )->startOfDay();
-                $date_last_modified_ad = $date_today->copy()->setTimestamp( $content )->startOfDay();
+                $date_last_modified_hcm = $date_today->copy()->setTimestamp( $date_timestamp_last_modified_hcm )->startOfDay();
+                $date_last_modified_ad = $date_today->copy()->setTimestamp( $date_timestamp_last_modified_ad )->startOfDay();
                 
                 $resultDataArray['date_today'] = $date_today;
                 $resultDataArray['date_last_modified_hcm'] = $date_last_modified_hcm;

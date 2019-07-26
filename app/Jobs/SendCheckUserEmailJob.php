@@ -37,9 +37,12 @@ class SendCheckUserEmailJob implements ShouldQueue
     {
         //
         $check_user_data_array = $this->check_user_data_array;
-        $to_user_array = $this->check_user_data_array;
-        if( (isset($check_user_data_array)) && (!empty($check_user_data_array['mail_user_array_to'])) ){
-            $toUserArray = $check_user_data_array['mail_user_array_to'];
+        $to_user_array = array();
+        if( (isset( $check_user_data_array['check_user_data'] )) && (!empty( $check_user_data_array['check_user_data'] )) ){
+            $to_user_array = $check_user_data_array['check_user_data']['mail_user_array_to'];
+        }
+        if( (isset($check_user_data_array)) && (!empty( $to_user_array )) ){
+            $toUserArray = $to_user_array;
             Mail::to($toUserArray)
                 //->subject("Subject")
                 //->cc($ccUserArray)

@@ -1,7 +1,7 @@
 @isset($check_user_data_array)
     
     @if( (isset($check_user_data_array['message'])) && (!empty($check_user_data_array['message'])) )
-        <h3> Detected AD Users </h3>
+        <h3> {{ $check_user_data_array['message'] }} </h3>
     @endif
 
     @if( (isset($check_user_data_array['array_user_ad'])) && (!empty($check_user_data_array['array_user_ad'])) )
