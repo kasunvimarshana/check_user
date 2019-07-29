@@ -94,8 +94,16 @@ class CheckUserCommand extends Command
                 //$dt1->greaterThan( $dt2 );
 
                 $date_today = Carbon::now()->startOfDay();
-                $date_timestamp_last_modified_hcm = File::lastModified( $file_uri_user_hcm );
-                $date_timestamp_last_modified_ad = File::lastModified( $file_uri_user_ad );
+                $date_timestamp_last_modified_hcm = $date_today->timestamp; //File::lastModified( $file_uri_user_hcm );
+                $date_timestamp_last_modified_ad = $date_today->timestamp; //File::lastModified( $file_uri_user_ad );
+                
+                if( File::exists( $file_uri_user_hcm ) ){
+                    $date_timestamp_last_modified_hcm = File::lastModified( $file_uri_user_hcm );
+                }
+                
+                if( File::exists( $file_uri_user_ad ) ){
+                    $date_timestamp_last_modified_ad = File::lastModified( $file_uri_user_ad );
+                }
 
                 $date_last_modified_hcm = $date_today->copy()->setTimestamp( $date_timestamp_last_modified_hcm )->startOfDay();
                 $date_last_modified_ad = $date_today->copy()->setTimestamp( $date_timestamp_last_modified_ad )->startOfDay();
