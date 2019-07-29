@@ -1,7 +1,11 @@
 @isset($check_user_data_array)
     
-    @if( (isset($check_user_data_array['message'])) && (!empty($check_user_data_array['message'])) )
-        <h3> {{ $check_user_data_array['message'] }} </h3>
+    @if( (isset($check_user_data_array['message_title'])) && (!empty($check_user_data_array['message_title'])) )
+        <h3> {{ $check_user_data_array['message_title'] }} </h3>
+    @endif
+
+    @if( (isset($check_user_data_array['message_body'])) && (!empty($check_user_data_array['message_body'])) )
+        <h3> {{ $check_user_data_array['message_body'] }} </h3>
     @endif
 
     @if( (isset($check_user_data_array['array_user_ad'])) && (!empty($check_user_data_array['array_user_ad'])) )
@@ -32,4 +36,4 @@
 
 @endisset
 
-<p>****** System Genarated Message ******</p>
+<p>****** System Generated Message ******</p>

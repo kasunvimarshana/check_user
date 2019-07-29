@@ -153,22 +153,28 @@ class CheckUserCommand extends Command
                     }
 
                     if( ($array_user_ad) && (!$array_user_ad->isEmpty()) ){
-                        $resultDataArray['message'] = 'User Account verified';
+                        $resultDataArray['message_title'] = 'User Account Reconciliation Report';
+                        $resultDataArray['message_body'] = 'Dear all, <br/>
+                        Please find the user accounts which are active in Active Directory & inactive in HRIS. 
+                        Please do the needful in your respective areas.';
                         $resultDataArray['array_user_ad'] = $array_user_ad;
                         $emailJob = (new SendCheckUserEmailJob( $resultDataArray ));
                         //dispatch($emailJob);
                     }else{
-                        $resultDataArray['message'] = 'User Account verified, No discrepancy is found';
+                        $resultDataArray['message_title'] = 'User Account verified, No discrepancy is found';
                         $emailJob = (new SendCheckUserEmailJob( $resultDataArray ));
                         //dispatch($emailJob);
                     }
 
                 }else{
-                    $resultDataArray['message'] = 'CSV file update error';
+                    $resultDataArray['message_title'] = 'CSV file update error';
+                    $resultDataArray['message_body'] = 'Dear all, <br/>'
+                        .'AD Backup Date : '. $resultDataArray['date_last_modified_ad'] .'<br/>' 
+                        .'HCM Backup Date : '. $resultDataArray['date_last_modified_hcm'] .'<br/>';
                     $emailJob = (new SendCheckUserEmailJob( $resultDataArray ));
                     //dispatch($emailJob);
                 }
-                
+
                 dispatch($emailJob);
             }catch(Exception $e){
 
