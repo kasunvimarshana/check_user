@@ -61,7 +61,7 @@ class CheckUserCommand extends Command
                 'file_uri_user_hcm' => '/userdata$/Common_Share/ICT/Employee_Reconciliation/HCM.xls',
                 'file_uri_user_ad' => '/userdata$/Common_Share/ICT/Employee_Reconciliation/BLI-Users.csv',
                 'mail_user_array_to' => array(
-                    'kasunv@brandix.com', 'Prabhathdh@brandix.com', 'SumithK@brandix.com', 'SamithaSu@brandix.com', 'PoornimalA@brandix.com', 'TharangaWij@brandix.com'
+                    'kasunv@brandix.com', 'Prabhathdh@brandix.com', 'SumithK@brandix.com', 'SamithaSu@brandix.com', 'PoornimalA@brandix.com', 'TharangaWij@brandix.com', 'chathurikaw@brandix.com', 'ChathuranD@brandix.com', 'RaveeshaH@brandix.com', 'ChamodiDa@brandix.com', 'ChamaraS@brandix.com', 'ErandiR@brandix.com'
                 )
             )
         );
@@ -153,24 +153,25 @@ class CheckUserCommand extends Command
                     }
 
                     if( ($array_user_ad) && (!$array_user_ad->isEmpty()) ){
+                        $resultDataArray['message_type'] = 'default';
                         $resultDataArray['message_title'] = 'User Account Reconciliation Report';
-                        $resultDataArray['message_body'] = 'Dear all, <br/>
+                        $resultDataArray['message_body'] = 'Dear all, 
                         Please find the user accounts which are active in Active Directory & inactive in HRIS. 
                         Please do the needful in your respective areas.';
                         $resultDataArray['array_user_ad'] = $array_user_ad;
                         $emailJob = (new SendCheckUserEmailJob( $resultDataArray ));
                         //dispatch($emailJob);
                     }else{
+                        $resultDataArray['message_type'] = 'default';
                         $resultDataArray['message_title'] = 'User Account verified, No discrepancy is found';
                         $emailJob = (new SendCheckUserEmailJob( $resultDataArray ));
                         //dispatch($emailJob);
                     }
 
                 }else{
+                    $resultDataArray['message_type'] = 'error';
                     $resultDataArray['message_title'] = 'CSV file update error';
-                    $resultDataArray['message_body'] = 'Dear all, <br/>'
-                        .'AD Backup Date : '. $resultDataArray['date_last_modified_ad'] .'<br/>' 
-                        .'HCM Backup Date : '. $resultDataArray['date_last_modified_hcm'] .'<br/>';
+                    $resultDataArray['message_body'] = 'Dear all, ';
                     $emailJob = (new SendCheckUserEmailJob( $resultDataArray ));
                     //dispatch($emailJob);
                 }

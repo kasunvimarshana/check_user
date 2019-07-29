@@ -5,7 +5,16 @@
     @endif
 
     @if( (isset($check_user_data_array['message_body'])) && (!empty($check_user_data_array['message_body'])) )
-        <h3> {{ $check_user_data_array['message_body'] }} </h3>
+        <!-- br/ -->
+        <p> {{ $check_user_data_array['message_body'] }} </p>
+    @endif
+
+    @if( (isset($check_user_data_array['message_type'])) && (!empty($check_user_data_array['message_type'])) )
+        @if( (strcasecmp($check_user_data_array['message_type'], 'error') == 0) )
+            <!-- br/ -->
+            <p>AD backup date : {{ $check_user_data_array['date_last_modified_ad'] }}</p>
+            <p>HCM backup date : {{ $check_user_data_array['date_last_modified_hcm'] }}</p>
+        @endif
     @endif
 
     @if( (isset($check_user_data_array['array_user_ad'])) && (!empty($check_user_data_array['array_user_ad'])) )
