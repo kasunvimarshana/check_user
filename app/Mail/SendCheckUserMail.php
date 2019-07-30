@@ -34,7 +34,7 @@ class SendCheckUserMail extends Mailable
         $check_user_data_array = $this->check_user_data_array;
         $message = $this;
         
-        $message = $message->subject("Users");
+        $message = (isset($check_user_data_array['message_title'])) ? $message->subject( $check_user_data_array['message_title'] ) : $message->subject("Users");
         $message = $message->view('mail.check_user_mail')->with([
             'check_user_data_array' => $check_user_data_array
         ]);

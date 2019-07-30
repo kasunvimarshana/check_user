@@ -62,6 +62,9 @@ class CheckUserCommand extends Command
                 'file_uri_user_ad' => '/userdata$/Common_Share/ICT/Employee_Reconciliation/BLI-Users.csv',
                 'mail_user_array_to' => array(
                     'kasunv@brandix.com', 'Prabhathdh@brandix.com', 'SumithK@brandix.com', 'SamithaSu@brandix.com', 'PoornimalA@brandix.com', 'TharangaWij@brandix.com', 'chathurikaw@brandix.com', 'ChathuranD@brandix.com', 'RaveeshaH@brandix.com', 'ChamodiDa@brandix.com', 'ChamaraS@brandix.com', 'ErandiR@brandix.com'
+                ),
+                'mail_user_array_1' => array(
+                    'kasunv@brandix.com', 'Prabhathdh@brandix.com', 'SumithK@brandix.com', 'SamithaSu@brandix.com', 'PoornimalA@brandix.com'
                 )
             )
         );
@@ -154,24 +157,25 @@ class CheckUserCommand extends Command
 
                     if( ($array_user_ad) && (!$array_user_ad->isEmpty()) ){
                         $resultDataArray['message_type'] = 'default';
-                        $resultDataArray['message_title'] = 'User Account Reconciliation Report';
-                        $resultDataArray['message_body'] = 'Dear all, 
-                        Please find the user accounts which are active in Active Directory & inactive in HRIS. 
-                        Please do the needful in your respective areas.';
+                        $resultDataArray['message_title'] = 'User Account Reconciliation Report as at [' . $resultDataArray['date_today'].format('Y-m-d') . ']';
+                        $resultDataArray['message_body'] = 'Dear all, IT Clearance not endorsed for following inactive user(s). Please action';
+                        $resultDataArray['check_user_data']['mail_user_array_to'] = $resultDataArray['check_user_data']['mail_user_array_1'];
                         $resultDataArray['array_user_ad'] = $array_user_ad;
                         $emailJob = (new SendCheckUserEmailJob( $resultDataArray ));
                         //dispatch($emailJob);
                     }else{
                         $resultDataArray['message_type'] = 'default';
-                        $resultDataArray['message_title'] = 'User Account verified, No discrepancy is found';
+                        $resultDataArray['message_title'] = 'User Account Reconciliation Report as at [' . $resultDataArray['date_today'].format('Y-m-d') . '] – [Comply]';
+                        $resultDataArray['check_user_data']['mail_user_array_to'] = $resultDataArray['check_user_data']['mail_user_array_1'];
                         $emailJob = (new SendCheckUserEmailJob( $resultDataArray ));
                         //dispatch($emailJob);
                     }
 
                 }else{
                     $resultDataArray['message_type'] = 'error';
-                    $resultDataArray['message_title'] = 'CSV file update error';
-                    $resultDataArray['message_body'] = 'Dear all, ';
+                    $resultDataArray['message_title'] = 'User Account Reconciliation Report as at [' . $resultDataArray['date_today'].format('Y-m-d') . '] – [Invalid CSV]';
+                    $resultDataArray['message_body'] = '';
+                    $resultDataArray['check_user_data']['mail_user_array_to'] = $resultDataArray['check_user_data']['mail_user_array_1'];
                     $emailJob = (new SendCheckUserEmailJob( $resultDataArray ));
                     //dispatch($emailJob);
                 }

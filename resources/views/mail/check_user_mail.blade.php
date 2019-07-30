@@ -12,8 +12,8 @@
     @if( (isset($check_user_data_array['message_type'])) && (!empty($check_user_data_array['message_type'])) )
         @if( (strcasecmp($check_user_data_array['message_type'], 'error') == 0) )
             <!-- br/ -->
-            <p>AD backup date : {{ $check_user_data_array['date_last_modified_ad'] }}</p>
-            <p>HCM backup date : {{ $check_user_data_array['date_last_modified_hcm'] }}</p>
+            <p>AD backup date : {{ $check_user_data_array['date_last_modified_ad']->format('Y-m-d') }}</p>
+            <p>HCM backup date : {{ $check_user_data_array['date_last_modified_hcm']->format('Y-m-d') }}</p>
         @endif
     @endif
 
