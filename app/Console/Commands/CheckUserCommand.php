@@ -157,15 +157,15 @@ class CheckUserCommand extends Command
 
                     if( ($array_user_ad) && (!$array_user_ad->isEmpty()) ){
                         $resultDataArray['message_type'] = 'default';
-                        $resultDataArray['message_title'] = 'User Account Reconciliation Report as at [' . $resultDataArray['date_today'].format('Y-m-d') . ']';
+                        $resultDataArray['message_title'] = 'User Account Reconciliation Report as at [' . $resultDataArray['date_today']->format('Y-m-d') . ']';
                         $resultDataArray['message_body'] = 'Dear all, IT Clearance not endorsed for following inactive user(s). Please action';
-                        $resultDataArray['check_user_data']['mail_user_array_to'] = $resultDataArray['check_user_data']['mail_user_array_1'];
+                        $resultDataArray['check_user_data']['mail_user_array_to'] = $resultDataArray['check_user_data']['check_user_data'];
                         $resultDataArray['array_user_ad'] = $array_user_ad;
                         $emailJob = (new SendCheckUserEmailJob( $resultDataArray ));
                         //dispatch($emailJob);
                     }else{
                         $resultDataArray['message_type'] = 'default';
-                        $resultDataArray['message_title'] = 'User Account Reconciliation Report as at [' . $resultDataArray['date_today'].format('Y-m-d') . '] – [Comply]';
+                        $resultDataArray['message_title'] = 'User Account Reconciliation Report as at [' . $resultDataArray['date_today']->format('Y-m-d') . '] – [Comply]';
                         $resultDataArray['check_user_data']['mail_user_array_to'] = $resultDataArray['check_user_data']['mail_user_array_1'];
                         $emailJob = (new SendCheckUserEmailJob( $resultDataArray ));
                         //dispatch($emailJob);
@@ -173,7 +173,7 @@ class CheckUserCommand extends Command
 
                 }else{
                     $resultDataArray['message_type'] = 'error';
-                    $resultDataArray['message_title'] = 'User Account Reconciliation Report as at [' . $resultDataArray['date_today'].format('Y-m-d') . '] – [Invalid CSV]';
+                    $resultDataArray['message_title'] = 'User Account Reconciliation Report as at [' . $resultDataArray['date_today']->format('Y-m-d') . '] – [Invalid CSV]';
                     $resultDataArray['message_body'] = '';
                     $resultDataArray['check_user_data']['mail_user_array_to'] = $resultDataArray['check_user_data']['mail_user_array_1'];
                     $emailJob = (new SendCheckUserEmailJob( $resultDataArray ));
