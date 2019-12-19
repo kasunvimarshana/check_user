@@ -16,6 +16,11 @@ use App\Imports\SecondSheetImport;
 class UserADImport implements ToModel
 {
     //
+    protected $index_1_column_dn = 0;
+    protected $index_1_column_given_name = 1;
+    protected $index_1_column_mail = 2;
+    protected $index_1_column_employee_number = 3;
+    protected $index_1_column_employee_type = 4;
     //use WithConditionalSheets;
     /**
      * @param array $row
@@ -25,11 +30,11 @@ class UserADImport implements ToModel
     public function model(array $row)
     {
         return new User([
-            'employee_number' => $row[5],
-            'employee_type' => $row[4],
-            'mail' => $row[3],
-            'given_name' => $row[1],
-            'dn' => $row[0]
+            'employee_number' => $row[$this->index_1_column_employee_number],
+            'employee_type' => $row[$this->index_1_column_employee_type],
+            'mail' => $row[$this->index_1_column_mail],
+            'given_name' => $row[$this->index_1_column_given_name],
+            'dn' => $row[$this->index_1_column_dn]
         ]);
     }
     

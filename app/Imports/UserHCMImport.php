@@ -16,6 +16,19 @@ use App\Imports\SecondSheetImport;
 class UserHCMImport implements ToModel
 {
     //
+    protected $index_2_column_employee_number = 0;
+    protected $index_2_column_e_p_f_number = 1;
+    protected $index_2_column_e_m_p_barcode = 2;
+    protected $index_2_column_e_m_p_full_name = 3;
+    protected $index_2_column_e_m_p_calling_name = 4;
+    protected $index_2_designation = 5;
+    protected $index_2_cluster = 6;
+    protected $index_2_location = 7;
+    protected $index_2_department = 8;
+    protected $index_2_roster = 9;
+    protected $index_2_skill_grade = 10;
+    protected $index_2_direct_indirect_status = 11;
+    protected $index_2_supervisor_name = 12;
     //use WithConditionalSheets;
     /**
      * @param array $row
@@ -25,12 +38,19 @@ class UserHCMImport implements ToModel
     public function model(array $row)
     {
         return new User([
-            'employee_number' => $row[0],
-            'epf_number' => $row[1],
-            'name' => $row[2],
-            'designation' => $row[3],
-            'department' => $row[4],
-            'roster' => $row[5]
+            'employee_number' => $row[$this->index_2_column_employee_number],
+            'e_p_f_number' => $row[$this->index_2_column_e_p_f_number],
+            'e_m_p_barcode' => $row[$this->index_2_column_e_m_p_barcode],
+            'e_m_p_full_name' => $row[$this->index_2_column_e_m_p_full_name],
+            'e_m_p_calling_name' => $row[$this->index_2_column_e_m_p_calling_name],
+            'designation' => $row[$this->index_2_designation],
+            'cluster' => $row[$this->index_2_cluster],
+            'location' => $row[$this->index_2_location],
+            'department' => $row[$this->index_2_department],
+            'roster' => $row[$this->index_2_roster],
+            'skill_grade' => $row[$this->index_2_skill_grade],
+            'direct_indirect_status' => $row[$this->index_2_direct_indirect_status],
+            'supervisor_name' => $row[$this->index_2_supervisor_name]
         ]);
     }
     

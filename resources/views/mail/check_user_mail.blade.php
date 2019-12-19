@@ -1,3 +1,13 @@
+@php
+$column_number = $check_user_data_array['column_number'];
+
+$index_1_column_dn = $column_number[0];
+$index_1_column_given_name = $column_number[1];
+$index_1_column_mail = $column_number[2];
+$index_1_column_employee_number = $column_number[3];
+$index_1_column_employee_type = $column_number[4];
+@endphp
+
 @isset($check_user_data_array)
     
     @if( (isset($check_user_data_array['message_title'])) && (!empty($check_user_data_array['message_title'])) )
@@ -27,15 +37,17 @@
                     <td style="width: 20%;text-align: right !important;"> MAIL </td>
                     <td style="width: 20%;text-align: right !important;"> EMPLOYEE TYPE </td>
                     <td style="width: 20%;text-align: right !important;"> EMPLOYEE NUMBER </td>
+                    <!-- td style="width: 20%;text-align: right !important;"> DN </td -->
                 </tr>
             </thead>
             <tbody>
                 @foreach($check_user_data_array['array_user_ad'] as $key => $value)
                     <tr>
-                        <td> {{ $value[1] }} </td>
-                        <td> {{ $value[2] }} </td>
-                        <td> {{ $value[3] }} </td>
-                        <td> {{ intval($value[4]) }} </td>
+                        <td> {{ $value[$index_1_column_given_name] }} </td>
+                        <td> {{ $value[$index_1_column_mail] }} </td>
+                        <td> {{ $value[$index_1_column_employee_type] }} </td>
+                        <td> {{ intval($value[$index_1_column_employee_number]) }} </td>
+                        <!-- td> {{ $value[$index_1_column_dn] }} </td -->
                     </tr>
                 @endforeach
             </tbody>
