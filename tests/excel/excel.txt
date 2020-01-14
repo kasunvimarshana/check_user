@@ -1,0 +1,405 @@
+Function getCalculatedStartTime_A(endDateAndTime As Range, _
+sumTimeToSet As Range, _
+sumTimeToFeed As Range, _
+scheduledBreakStart_1 As Range, _
+scheduledBreakEnd_1 As Range, _
+scheduledBreakStart_2 As Range, _
+scheduledBreakEnd_2 As Range, _
+Optional param As Range)
+    Dim tempDateTime_endDate As Date
+    Dim tempDateTime_endDateAndTime As Date
+    Dim tempScheduledBreak_diff_1 As Long
+    Dim tempScheduledBreak_diff_2 As Long
+    Dim temp_count As Long
+    
+    Dim tempDateTime_startDate_calc As Date
+    Dim tempDateTime_startDateAndTime_calc As Date
+    
+    Dim tempDateTime_calc_break_start_1 As Date
+    Dim tempDateTime_calc_break_end_1 As Date
+    Dim tempDateTime_calc_break_start_2 As Date
+    Dim tempDateTime_calc_break_end_2 As Date
+    
+    Dim tempDateTime_startDateAndTime As Date
+    
+    Dim threshold_time_1 As Date
+    Dim threshold_time_2 As Date
+    
+    Dim timeToSetOrFeed_in_minute As Long
+    Dim timeToSet_in_minute As Long
+    Dim timeToFeed_in_minute As Long
+    
+    Dim tempDate As Date
+    Dim tempDateDiff As Long
+    
+    timeToSet_in_minute = (Hour(sumTimeToSet) * 60)
+    timeToFeed_in_minute = (Hour(sumTimeToFeed) * 60)
+    timeToSet_in_minute = (timeToSet_in_minute + (Minute(sumTimeToSet)))
+    timeToFeed_in_minute = (timeToFeed_in_minute + (Minute(sumTimeToFeed)))
+    
+    timeToSetOrFeed_in_minute = 0
+    
+    If (timeToSet_in_minute < timeToFeed_in_minute) Then
+        timeToSetOrFeed_in_minute = timeToFeed_in_minute
+    Else
+        timeToSetOrFeed_in_minute = timeToSet_in_minute
+    End If
+    
+    tempDateTime_endDate = DateSerial(Year(endDateAndTime), Month(endDateAndTime), Day(endDateAndTime))
+    tempDateTime_endDateAndTime = tempDateTime_endDate + TimeSerial(Hour(endDateAndTime), Minute(endDateAndTime), Second(endDateAndTime))
+    
+    tempDateTime_startDate_calc = tempDateTime_endDate
+    tempDateTime_startDateAndTime = tempDateTime_endDateAndTime
+    
+    For temp_count = (0) To (timeToSetOrFeed_in_minute - 1)
+        tempDateTime_startDateAndTime = DateAdd("n", (-1), tempDateTime_startDateAndTime)
+    
+        tempDateTime_startDate_calc = DateSerial(Year(tempDateTime_startDateAndTime), Month(tempDateTime_startDateAndTime), Day(tempDateTime_startDateAndTime))
+        
+        tempDateTime_calc_break_start_1 = tempDateTime_startDate_calc
+        tempDateTime_calc_break_end_1 = tempDateTime_startDate_calc
+        tempDateTime_calc_break_start_2 = tempDateTime_startDate_calc
+        tempDateTime_calc_break_end_2 = tempDateTime_startDate_calc
+        
+        tempDateTime_calc_break_start_1 = tempDateTime_calc_break_start_1 + TimeSerial(Hour(scheduledBreakStart_1), Minute(scheduledBreakStart_1), Second(scheduledBreakStart_1))
+        tempDateTime_calc_break_end_1 = tempDateTime_calc_break_end_1 + TimeSerial(Hour(scheduledBreakEnd_1), Minute(scheduledBreakEnd_1), Second(scheduledBreakEnd_1))
+        tempDateTime_calc_break_start_2 = tempDateTime_calc_break_start_2 + TimeSerial(Hour(scheduledBreakStart_2), Minute(scheduledBreakStart_2), Second(scheduledBreakStart_2))
+        tempDateTime_calc_break_end_2 = tempDateTime_calc_break_end_2 + TimeSerial(Hour(scheduledBreakEnd_2), Minute(scheduledBreakEnd_2), Second(scheduledBreakEnd_2))
+        
+        tempScheduledBreak_diff_1 = DateDiff("n", tempDateTime_calc_break_start_1, tempDateTime_calc_break_end_1)
+        tempScheduledBreak_diff_2 = DateDiff("n", tempDateTime_calc_break_start_2, tempDateTime_calc_break_end_2)
+        
+        'lunch
+        If ((DateDiff("n", tempDateTime_calc_break_end_1, tempDateTime_startDateAndTime) < 0) And _
+        (DateDiff("n", tempDateTime_calc_break_start_1, tempDateTime_startDateAndTime) >= 0)) Then
+            tempDateTime_startDateAndTime = DateAdd("n", (tempScheduledBreak_diff_1 * -1), tempDateTime_startDateAndTime)
+        End If
+        'tea
+        If ((DateDiff("n", tempDateTime_calc_break_end_2, tempDateTime_startDateAndTime) < 0) And _
+        (DateDiff("n", tempDateTime_calc_break_start_2, tempDateTime_startDateAndTime) >= 0)) Then
+            tempDateTime_startDateAndTime = DateAdd("n", (tempScheduledBreak_diff_2 * -1), tempDateTime_startDateAndTime)
+        End If
+        
+        threshold_time_1 = tempDateTime_startDate_calc + TimeSerial(17, 30, 0)
+        threshold_time_2 = tempDateTime_startDate_calc + TimeSerial(7, 45, 0)
+        
+        'threshold time (5.30)
+        If ((DateDiff("n", threshold_time_1, tempDateTime_startDateAndTime) >= 0)) Then
+            tempDateDiff = DateDiff("n", threshold_time_1, tempDateTime_startDateAndTime)
+            tempDateTime_startDateAndTime = DateAdd("n", (tempDateDiff * -1), tempDateTime_startDateAndTime)
+        End If
+        
+        'threshold time (7.45)
+        If ((DateDiff("n", threshold_time_2, tempDateTime_startDateAndTime) < 0)) Then
+            tempDate = DateAdd("d", (-1), threshold_time_1)
+            tempDateDiff = DateDiff("n", tempDate, tempDateTime_startDateAndTime)
+            tempDateTime_startDateAndTime = DateAdd("n", (tempDateDiff * -1), tempDateTime_startDateAndTime)
+        End If
+    Next temp_count
+    
+    'date diff
+    'tempDateDiff = DateDiff("n", tempDateTime_startDateAndTime, estimateFinishTime)
+    'tempDateTime_startDateAndTime = DateAdd("n", (tempDateDiff), tempDateTime_startDateAndTime)
+    
+    'getCalculatedStartTime_A = Format(tempDateTime_startDateAndTime, "hh:mm:ss AMPM")
+    'getCalculatedStartTime_A = Format(tempDateTime_startDateAndTime, "dd/mm/yyyy hh:mm:ss AMPM")
+    getCalculatedStartTime_A = Format(tempDateTime_startDateAndTime, "dd/mm/yyyy hh:mm AMPM")
+End Function
+
+Function calculateEndDateAndTime_A(startDate As Range, startTime As Range, wip As Range, targetPerHour As Range, scheduledBreakStart_1 As Range, scheduledBreakEnd_1 As Range, scheduledBreakStart_2 As Range, scheduledBreakEnd_2 As Range, Optional param As Range)
+    Dim tempDateTime_startDate As Date
+    Dim tempDateTime_startDateAndTime As Date
+    Dim wipAndTargetPerHourCalculation_in_minute As Long
+    Dim tempScheduledBreak_diff_1 As Long
+    Dim tempScheduledBreak_diff_2 As Long
+    Dim temp_count As Long
+    
+    Dim tempDateTime_startDate_calc As Date
+    Dim tempDateTime_startDateAndTime_calc As Date
+    Dim tempDateDiff As Date
+    
+    Dim tempDateTime_calc_break_start_1 As Date
+    Dim tempDateTime_calc_break_end_1 As Date
+    Dim tempDateTime_calc_break_start_2 As Date
+    Dim tempDateTime_calc_break_end_2 As Date
+    
+    Dim tempDateTime_endDateAndTime As Date
+    
+    Dim threshold_time_1 As Date
+    
+    tempDateTime_startDate = DateSerial(Year(startDate), Month(startDate), Day(startDate))
+    tempDateTime_startDateAndTime = tempDateTime_startDate + TimeSerial(Hour(startTime), Minute(startTime), Second(startTime))
+    wipAndTargetPerHourCalculation_in_minute = ((wip / targetPerHour) * 60)
+    
+    tempDateTime_startDate_calc = tempDateTime_startDate
+    tempDateTime_endDateAndTime = tempDateTime_startDateAndTime
+    
+    For temp_count = (0) To (wipAndTargetPerHourCalculation_in_minute - 1)
+        tempDateTime_endDateAndTime = DateAdd("n", 1, tempDateTime_endDateAndTime)
+    
+        'tempDateDiff = (DateDiff("d", tempDateTime_startDateAndTime, tempDateTime_endDateAndTime))
+        'tempDateTime_startDate_calc = DateAdd("d", tempDateDiff, tempDateTime_startDate)
+        tempDateTime_startDate_calc = DateSerial(Year(tempDateTime_endDateAndTime), Month(tempDateTime_endDateAndTime), Day(tempDateTime_endDateAndTime))
+        
+        tempDateTime_calc_break_start_1 = tempDateTime_startDate_calc
+        tempDateTime_calc_break_end_1 = tempDateTime_startDate_calc
+        tempDateTime_calc_break_start_2 = tempDateTime_startDate_calc
+        tempDateTime_calc_break_end_2 = tempDateTime_startDate_calc
+        
+        tempDateTime_calc_break_start_1 = tempDateTime_calc_break_start_1 + TimeSerial(Hour(scheduledBreakStart_1), Minute(scheduledBreakStart_1), Second(scheduledBreakStart_1))
+        tempDateTime_calc_break_end_1 = tempDateTime_calc_break_end_1 + TimeSerial(Hour(scheduledBreakEnd_1), Minute(scheduledBreakEnd_1), Second(scheduledBreakEnd_1))
+        tempDateTime_calc_break_start_2 = tempDateTime_calc_break_start_2 + TimeSerial(Hour(scheduledBreakStart_2), Minute(scheduledBreakStart_2), Second(scheduledBreakStart_2))
+        tempDateTime_calc_break_end_2 = tempDateTime_calc_break_end_2 + TimeSerial(Hour(scheduledBreakEnd_2), Minute(scheduledBreakEnd_2), Second(scheduledBreakEnd_2))
+        
+        tempScheduledBreak_diff_1 = DateDiff("n", tempDateTime_calc_break_start_1, tempDateTime_calc_break_end_1)
+        tempScheduledBreak_diff_2 = DateDiff("n", tempDateTime_calc_break_start_2, tempDateTime_calc_break_end_2)
+        
+        'lunch
+        If ((DateDiff("n", tempDateTime_calc_break_end_1, tempDateTime_endDateAndTime) < 0) And _
+        (DateDiff("n", tempDateTime_calc_break_start_1, tempDateTime_endDateAndTime) >= 0)) Then
+            tempDateTime_endDateAndTime = DateAdd("n", tempScheduledBreak_diff_1, tempDateTime_endDateAndTime)
+        End If
+        'tea
+        If ((DateDiff("n", tempDateTime_calc_break_end_2, tempDateTime_endDateAndTime) < 0) And _
+        (DateDiff("n", tempDateTime_calc_break_start_2, tempDateTime_endDateAndTime) >= 0)) Then
+            tempDateTime_endDateAndTime = DateAdd("n", tempScheduledBreak_diff_2, tempDateTime_endDateAndTime)
+        End If
+        
+        'threshold time (5.30)
+        threshold_time_1 = tempDateTime_startDate_calc + TimeSerial(17, 30, 0)
+        If ((DateDiff("n", threshold_time_1, tempDateTime_endDateAndTime) >= 0)) Then
+            tempDateTime_endDateAndTime = DateAdd("h", 14, tempDateTime_endDateAndTime)
+            tempDateTime_endDateAndTime = DateAdd("n", 15, tempDateTime_endDateAndTime)
+        End If
+    Next temp_count
+    
+    'calculateEndDateAndTime_A = Format(tempDateTime_endDateAndTime, "hh:mm:ss AMPM")
+    'calculateEndDateAndTime_A = Format(tempDateTime_endDateAndTime, "dd/mm/yyyy hh:mm:ss AMPM")
+    calculateEndDateAndTime_A = Format(tempDateTime_endDateAndTime, "dd/mm/yyyy hh:mm AMPM")
+End Function
+
+Function getCalculatedStartTime_B(previousStartTime As Range, _
+previousTimeToSetMachine As Range, _
+previousTimeToFeedMachine As Range, _
+previousEstimateFinishTime As Range, _
+scheduledBreakStart_1 As Range, _
+scheduledBreakEnd_1 As Range, _
+scheduledBreakStart_2 As Range, _
+scheduledBreakEnd_2 As Range)
+    Dim tempDateTime_startDate As Date
+    Dim tempDateTime_startDateAndTime As Date
+    Dim tempScheduledBreak_diff_1 As Long
+    Dim tempScheduledBreak_diff_2 As Long
+    Dim temp_count As Long
+    
+    Dim tempDateTime_startDate_calc As Date
+    Dim tempDateTime_startDateAndTime_calc As Date
+    
+    Dim tempDateTime_calc_break_start_1 As Date
+    Dim tempDateTime_calc_break_end_1 As Date
+    Dim tempDateTime_calc_break_start_2 As Date
+    Dim tempDateTime_calc_break_end_2 As Date
+    
+    Dim tempDateTime_startDateAndTime_result As Date
+    
+    Dim threshold_time_1 As Date
+    Dim threshold_time_2 As Date
+    
+    Dim timeToSet_in_minute As Long
+    Dim timeToFeed_in_minute As Long
+    
+    Dim tempDate As Date
+    Dim tempDateDiff As Long
+    
+    tempDateTime_startDate = DateSerial(Year(previousStartTime), Month(previousStartTime), Day(previousStartTime))
+    tempDateTime_startDateAndTime = tempDateTime_startDate + TimeSerial(Hour(previousStartTime), Minute(previousStartTime), Second(previousStartTime))
+    
+    tempDateTime_startDate_calc = tempDateTime_startDate
+    tempDateTime_startDateAndTime_result = tempDateTime_startDateAndTime
+    
+    timeToSet_in_minute = (Hour(previousTimeToSetMachine) * 60)
+    timeToFeed_in_minute = (Hour(previousTimeToFeedMachine) * 60)
+    timeToSet_in_minute = (timeToSet_in_minute + (Minute(previousTimeToSetMachine)))
+    timeToFeed_in_minute = (timeToFeed_in_minute + (Minute(previousTimeToFeedMachine)))
+    
+    For temp_count = (0) To (timeToSet_in_minute - 1)
+        tempDateTime_startDateAndTime_result = DateAdd("n", 1, tempDateTime_startDateAndTime_result)
+    
+        tempDateTime_startDate_calc = DateSerial(Year(tempDateTime_startDateAndTime_result), Month(tempDateTime_startDateAndTime_result), Day(tempDateTime_startDateAndTime_result))
+        
+        tempDateTime_calc_break_start_1 = tempDateTime_startDate_calc
+        tempDateTime_calc_break_end_1 = tempDateTime_startDate_calc
+        tempDateTime_calc_break_start_2 = tempDateTime_startDate_calc
+        tempDateTime_calc_break_end_2 = tempDateTime_startDate_calc
+        
+        tempDateTime_calc_break_start_1 = tempDateTime_calc_break_start_1 + TimeSerial(Hour(scheduledBreakStart_1), Minute(scheduledBreakStart_1), Second(scheduledBreakStart_1))
+        tempDateTime_calc_break_end_1 = tempDateTime_calc_break_end_1 + TimeSerial(Hour(scheduledBreakEnd_1), Minute(scheduledBreakEnd_1), Second(scheduledBreakEnd_1))
+        tempDateTime_calc_break_start_2 = tempDateTime_calc_break_start_2 + TimeSerial(Hour(scheduledBreakStart_2), Minute(scheduledBreakStart_2), Second(scheduledBreakStart_2))
+        tempDateTime_calc_break_end_2 = tempDateTime_calc_break_end_2 + TimeSerial(Hour(scheduledBreakEnd_2), Minute(scheduledBreakEnd_2), Second(scheduledBreakEnd_2))
+        
+        tempScheduledBreak_diff_1 = DateDiff("n", tempDateTime_calc_break_start_1, tempDateTime_calc_break_end_1)
+        tempScheduledBreak_diff_2 = DateDiff("n", tempDateTime_calc_break_start_2, tempDateTime_calc_break_end_2)
+        
+        'lunch
+        If ((DateDiff("n", tempDateTime_calc_break_end_1, tempDateTime_startDateAndTime_result) < 0) And _
+        (DateDiff("n", tempDateTime_calc_break_start_1, tempDateTime_startDateAndTime_result) >= 0)) Then
+            tempDateTime_startDateAndTime_result = DateAdd("n", tempScheduledBreak_diff_1, tempDateTime_startDateAndTime_result)
+        End If
+        'tea
+        If ((DateDiff("n", tempDateTime_calc_break_end_2, tempDateTime_startDateAndTime_result) < 0) And _
+        (DateDiff("n", tempDateTime_calc_break_start_2, tempDateTime_startDateAndTime_result) >= 0)) Then
+            tempDateTime_startDateAndTime_result = DateAdd("n", tempScheduledBreak_diff_2, tempDateTime_startDateAndTime_result)
+        End If
+        
+        'threshold time (5.30)
+        threshold_time_1 = tempDateTime_startDate_calc + TimeSerial(17, 30, 0)
+        If ((DateDiff("n", threshold_time_1, tempDateTime_startDateAndTime_result) >= 0)) Then
+            tempDateTime_startDateAndTime_result = DateAdd("h", 14, tempDateTime_startDateAndTime_result)
+            tempDateTime_startDateAndTime_result = DateAdd("n", 15, tempDateTime_startDateAndTime_result)
+        End If
+    Next temp_count
+    
+    getCalculatedStartTime_B = Format(tempDateTime_startDateAndTime_result, "dd/mm/yyyy hh:mm AMPM")
+End Function
+
+Function getCalculatedFinishTime_B(startTime As Range, _
+timeToSetMachine As Range, _
+timeToFeed As Range, _
+previousEstimateFinishTime As Range, _
+scheduledBreakStart_1 As Range, _
+scheduledBreakEnd_1 As Range, _
+scheduledBreakStart_2 As Range, _
+scheduledBreakEnd_2 As Range, _
+isCheck As Boolean, _
+Optional param As Range)
+    Dim tempDateTime_startDate As Date
+    Dim tempDateTime_startDateAndTime As Date
+    Dim tempScheduledBreak_diff_1 As Long
+    Dim tempScheduledBreak_diff_2 As Long
+    Dim temp_count As Long
+    
+    Dim tempDateTime_endDate_calc As Date
+    Dim tempDateTime_endDateAndTime_calc As Date
+    
+    Dim tempDateTime_calc_break_start_1 As Date
+    Dim tempDateTime_calc_break_end_1 As Date
+    Dim tempDateTime_calc_break_start_2 As Date
+    Dim tempDateTime_calc_break_end_2 As Date
+    
+    'Dim tempDateTime_endDateAndTime As Date
+    
+    Dim threshold_time_1 As Date
+    Dim threshold_time_2 As Date
+    
+    Dim timeToSet_in_minute As Long
+    Dim timeToFeed_in_minute As Long
+    
+    Dim tempDate As Date
+    Dim tempDateDiff As Long
+    
+    Dim tempDateTime_startDateAndTime_val As Date
+    Dim tempDateTime_previousEstimateFinishTime_val As Date
+    
+    timeToSet_in_minute = (Hour(timeToSetMachine) * 60)
+    timeToFeed_in_minute = (Hour(timeToFeed) * 60)
+    timeToSet_in_minute = (timeToSet_in_minute + (Minute(timeToSetMachine)))
+    timeToFeed_in_minute = (timeToFeed_in_minute + (Minute(timeToFeed)))
+    
+    tempDateTime_startDateAndTime_val = DateSerial(Year(startTime), Month(startTime), Day(startTime))
+    tempDateTime_startDateAndTime_val = (tempDateTime_startDateAndTime_val + TimeSerial(Hour(startTime), Minute(startTime), Second(startTime)))
+    
+    If (isCheck) Then
+        tempDateTime_previousEstimateFinishTime_val = DateSerial(Year(previousEstimateFinishTime), Month(previousEstimateFinishTime), Day(previousEstimateFinishTime))
+        tempDateTime_previousEstimateFinishTime_val = (tempDateTime_previousEstimateFinishTime_val + TimeSerial(Hour(previousEstimateFinishTime), Minute(previousEstimateFinishTime), Second(previousEstimateFinishTime)))
+        
+        tempDateTime_startDateAndTime_val = DateAdd("n", timeToSet_in_minute, tempDateTime_startDateAndTime_val)
+        
+        If ((DateDiff("n", tempDateTime_startDateAndTime_val, tempDateTime_previousEstimateFinishTime_val) > 0)) Then
+            tempDateTime_startDateAndTime = tempDateTime_previousEstimateFinishTime_val
+        Else
+            tempDateTime_startDateAndTime = tempDateTime_startDateAndTime_val
+        End If
+    Else
+        tempDateTime_startDateAndTime = tempDateTime_startDateAndTime_val
+    End If
+    
+    tempDateTime_startDate = DateSerial(Year(tempDateTime_startDateAndTime), Month(tempDateTime_startDateAndTime), Day(tempDateTime_startDateAndTime))
+    'tempDateTime_startDateAndTime = tempDateTime_startDate + TimeSerial(Hour(tempDateTime_startDateAndTime), Minute(tempDateTime_startDateAndTime), Second(tempDateTime_startDateAndTime))
+    
+    tempDateTime_endDate_calc = tempDateTime_startDate
+    tempDateTime_endDateAndTime_calc = tempDateTime_startDateAndTime
+    
+    For temp_count = (0) To (timeToFeed_in_minute - 1)
+        tempDateTime_endDateAndTime_calc = DateAdd("n", 1, tempDateTime_endDateAndTime_calc)
+        tempDateTime_endDate_calc = DateSerial(Year(tempDateTime_endDateAndTime_calc), Month(tempDateTime_endDateAndTime_calc), Day(tempDateTime_endDateAndTime_calc))
+        
+        tempDateTime_calc_break_start_1 = tempDateTime_endDate_calc
+        tempDateTime_calc_break_end_1 = tempDateTime_endDate_calc
+        tempDateTime_calc_break_start_2 = tempDateTime_endDate_calc
+        tempDateTime_calc_break_end_2 = tempDateTime_endDate_calc
+        
+        tempDateTime_calc_break_start_1 = tempDateTime_calc_break_start_1 + TimeSerial(Hour(scheduledBreakStart_1), Minute(scheduledBreakStart_1), Second(scheduledBreakStart_1))
+        tempDateTime_calc_break_end_1 = tempDateTime_calc_break_end_1 + TimeSerial(Hour(scheduledBreakEnd_1), Minute(scheduledBreakEnd_1), Second(scheduledBreakEnd_1))
+        tempDateTime_calc_break_start_2 = tempDateTime_calc_break_start_2 + TimeSerial(Hour(scheduledBreakStart_2), Minute(scheduledBreakStart_2), Second(scheduledBreakStart_2))
+        tempDateTime_calc_break_end_2 = tempDateTime_calc_break_end_2 + TimeSerial(Hour(scheduledBreakEnd_2), Minute(scheduledBreakEnd_2), Second(scheduledBreakEnd_2))
+        
+        tempScheduledBreak_diff_1 = DateDiff("n", tempDateTime_calc_break_start_1, tempDateTime_calc_break_end_1)
+        tempScheduledBreak_diff_2 = DateDiff("n", tempDateTime_calc_break_start_2, tempDateTime_calc_break_end_2)
+        
+        'lunch
+        If ((DateDiff("n", tempDateTime_calc_break_end_1, tempDateTime_endDateAndTime_calc) < 0) And _
+        (DateDiff("n", tempDateTime_calc_break_start_1, tempDateTime_endDateAndTime_calc) >= 0)) Then
+            tempDateTime_endDateAndTime_calc = DateAdd("n", tempScheduledBreak_diff_1, tempDateTime_endDateAndTime_calc)
+        End If
+        'tea
+        If ((DateDiff("n", tempDateTime_calc_break_end_2, tempDateTime_endDateAndTime_calc) < 0) And _
+        (DateDiff("n", tempDateTime_calc_break_start_2, tempDateTime_endDateAndTime_calc) >= 0)) Then
+            tempDateTime_endDateAndTime_calc = DateAdd("n", tempScheduledBreak_diff_2, tempDateTime_endDateAndTime_calc)
+        End If
+        
+        'threshold time (5.30)
+        threshold_time_1 = tempDateTime_endDate_calc + TimeSerial(17, 30, 0)
+        If ((DateDiff("n", threshold_time_1, tempDateTime_endDateAndTime_calc) >= 0)) Then
+            tempDateTime_endDateAndTime_calc = DateAdd("h", 14, tempDateTime_endDateAndTime_calc)
+            tempDateTime_endDateAndTime_calc = DateAdd("n", 15, tempDateTime_endDateAndTime_calc)
+        End If
+    Next temp_count
+    
+    ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    Dim vaArgs As Variant
+    Dim tempFormula As String
+    'vaArgs = Split(Split(Left(Rng.Formula, Len(Rng.Formula) - 1), "MyFunc(")(1), ",")
+    
+    If (isCheck = False) Then
+        'MsgBox ThisWorkbook.ActiveSheet.Range("F43").Formula 'FormulaR1C1
+        'MsgBox ThisWorkbook.ActiveSheet.Range("F43").HasFormula
+        'MsgBox ThisWorkbook.ActiveSheet.Range("F43").Value2
+        'Evaluate formula
+        
+        tempFormula = ThisWorkbook.ActiveSheet.Range("F43").Formula
+        MsgBox tempFormula
+        vaArgs = Split(Split(Left(tempFormula, Len(tempFormula) - 1), "getCalculatedStartTime_B(")(1), ",")
+        MsgBox tempFormula & " [0 = ] " & vaArgs(0)
+        MsgBox tempFormula & " [1 = ] " & vaArgs(1)
+        MsgBox tempFormula & " [2 = ] " & vaArgs(2)
+        MsgBox tempFormula & " [3 = ] " & vaArgs(3)
+        MsgBox tempFormula & " [4 = ] " & vaArgs(4)
+        MsgBox tempFormula & " [5 = ] " & vaArgs(5)
+        MsgBox tempFormula & " [6 = ] " & vaArgs(6)
+        MsgBox tempFormula & " [7 = ] " & vaArgs(7)
+        MsgBox tempFormula & " [8 = ] " & vaArgs(8)
+    End If
+    ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    
+    getCalculatedFinishTime_B = Format(tempDateTime_endDateAndTime_calc, "dd/mm/yyyy hh:mm AMPM")
+End Function
+
+Sub Calibrate_StartTime_Values()
+    Dim wksSource As Worksheet
+    Dim startDateAndTime As Range
+    Dim endDateAndTime As Range
+    Dim estimateFinishDateAndTime As Range
+
+    Set wksSource = ThisWorkbook.Sheets("Feeding Plan")
+    Set startDateAndTime = wksSource.Range("A1:A1")
+End Sub

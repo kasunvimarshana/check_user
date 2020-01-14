@@ -160,7 +160,13 @@ class CheckUserCommand extends Command
                             unset($array_user_ad[$key_user_ad]);
                             continue;
                         }
+                        /*
                         if((strcasecmp($value_user_ad[$index_1_column_employee_type] ,'Executive') == 0)){
+                            unset($array_user_ad[$key_user_ad]);
+                            continue;
+                        }
+                        */
+                        if((strcasecmp($value_user_ad[$index_1_column_employee_type] ,'Staff') != 0)){
                             unset($array_user_ad[$key_user_ad]);
                             continue;
                         }
@@ -311,7 +317,13 @@ class CheckUserCommand extends Command
                             unset($array_user_ad[$key_user_ad]);
                             continue;
                         }
+                        /*
                         if((strcasecmp($value_user_ad[$index_1_column_employee_type] ,'Executive') == 0)){
+                            unset($array_user_ad[$key_user_ad]);
+                            continue;
+                        }
+                        */
+                        if((strcasecmp($value_user_ad[$index_1_column_employee_type] ,'Staff') != 0)){
                             unset($array_user_ad[$key_user_ad]);
                             continue;
                         }
@@ -462,7 +474,13 @@ class CheckUserCommand extends Command
                             unset($array_user_ad[$key_user_ad]);
                             continue;
                         }
+                        /*
                         if((strcasecmp($value_user_ad[$index_1_column_employee_type] ,'Executive') == 0)){
+                            unset($array_user_ad[$key_user_ad]);
+                            continue;
+                        }
+                        */
+                        if((strcasecmp($value_user_ad[$index_1_column_employee_type] ,'Staff') != 0)){
                             unset($array_user_ad[$key_user_ad]);
                             continue;
                         }
@@ -612,7 +630,13 @@ class CheckUserCommand extends Command
                             unset($array_user_ad[$key_user_ad]);
                             continue;
                         }
+                        /*
                         if((strcasecmp($value_user_ad[$index_1_column_employee_type] ,'Executive') == 0)){
+                            unset($array_user_ad[$key_user_ad]);
+                            continue;
+                        }
+                        */
+                        if((strcasecmp($value_user_ad[$index_1_column_employee_type] ,'Staff') != 0)){
                             unset($array_user_ad[$key_user_ad]);
                             continue;
                         }
